@@ -5,16 +5,7 @@ export const raftOptions: ClientOptions = {
     transport: Transport.GRPC,
     options: {
         package: 'raft',
-        protoPath: './src/transport_layers/rpc/raft.proto',
-        url: 'localhost: 8000',
-    }
-};
-
-export const heroOptions: ClientOptions   = {
-    transport: Transport.GRPC,
-    options: {
-        package: 'hero',
-        protoPath: './src/transport_layers/rpc/hero.proto',
+        protoPath: './src/transport-layers/rpc/raft.proto',
         url: 'localhost: 8000',
     }
 };

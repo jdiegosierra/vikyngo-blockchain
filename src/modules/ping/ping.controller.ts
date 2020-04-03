@@ -6,7 +6,7 @@ export class PingController {
   constructor(private readonly pingService: PingService) {}
 
   @Get()
-  async findAll(): Promise<String>  {
+  async get(): Promise<string>  {
     return this.pingService.get();
   }
 }

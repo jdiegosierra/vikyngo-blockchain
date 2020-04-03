@@ -5,7 +5,7 @@ import config from './config/default'; // TODO: Custom path process.env["NODE_CO
 // Dependencies
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { heroOptions, raftOptions, tcpOptions } from './config/transportOptions';
+import { raftOptions, tcpOptions } from './config/transportOptions';
 // TODO: Use Nest Logger
 // import { logger } from '@utils/logger';
 
@@ -16,7 +16,6 @@ import { heroOptions, raftOptions, tcpOptions } from './config/transportOptions'
   // TODO: Build from FactoryServices
   app.connectMicroservice(tcpOptions);
   app.connectMicroservice(raftOptions);
-  app.connectMicroservice(heroOptions);
   await app.startAllMicroservicesAsync();
   // TODO: Bug with port. App overwrites TCPOptions
   await app.listen(config.server['PORT'], () =>
