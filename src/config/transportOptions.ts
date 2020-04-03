@@ -1,7 +1,16 @@
-import { Transport, ClientOptions } from "@nestjs/microservices";
+import { Transport, ClientOptions, TcpClientOptions } from '@nestjs/microservices';
 import {join} from "path";
 
-export const grpcOptions: ClientOptions   = {
+export const raftOptions: ClientOptions = {
+    transport: Transport.GRPC,
+    options: {
+        package: 'raft',
+        protoPath: './src/transport_layers/rpc/raft.proto',
+        url: 'localhost: 8000',
+    }
+};
+
+export const heroOptions: ClientOptions   = {
     transport: Transport.GRPC,
     options: {
         package: 'hero',
@@ -10,9 +19,10 @@ export const grpcOptions: ClientOptions   = {
     }
 };
 
-export const tcpOptions = {
+export const tcpOptions: TcpClientOptions = {
     transport: Transport.TCP,
     options: {
-        url: 'localhost: 3001',
+        host: 'localhost',
+        port: 3002
     }
 };

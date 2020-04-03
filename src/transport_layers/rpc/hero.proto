@@ -5,6 +5,7 @@ package hero;
 service HeroService {
   rpc FindOne (HeroById) returns (Hero) {}
   rpc FindMany (stream HeroById) returns (stream Hero) {}
+  rpc LeaderRequest(RaftRequest) returns (RaftResponse) {}
 }
 
 message HeroById {
@@ -14,4 +15,12 @@ message HeroById {
 message Hero {
   int32 id = 1;
   string name = 2;
+}
+
+message RaftRequest {
+  string message = 1;
+}
+
+message RaftResponse {
+  string message = 1;
 }

@@ -1,17 +1,23 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule } from '@nestjs/microservices';
-import { grpcOptions } from '../../config/transportOptions';
-import { RpcController } from './rpc.controller';
+import { heroOptions, raftOptions } from '../../config/transportOptions';
+import { RaftController, RpcController } from './rpc.controller';
 
 @Module({
   imports: [
     ClientsModule.register([
       {
+        name: 'RAFT_PACKAGE',
+        ...raftOptions,
+      },
+    ]),
+    ClientsModule.register([
+      {
         name: 'HERO_PACKAGE',
-        ...grpcOptions,
+        ...heroOptions,
       },
     ]),
   ],
-  controllers: [RpcController],
+  controllers: [RaftController, RpcController],
 })
 export class RpcModule {}

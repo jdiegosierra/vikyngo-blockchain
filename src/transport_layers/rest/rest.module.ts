@@ -29,9 +29,10 @@ await app.listen(config.server['PORT'] || 3000); // Host?
 import { Module } from '@nestjs/common';
 import { PingController } from "../../modules/ping/ping.controller";
 import { PingService } from "../../modules/ping/ping.service";
+import { RestController } from './rest.controller';
 
 @Module({
-    controllers: [PingController],
+    controllers: [PingController, RestController],
     providers: [PingService]
 })
 export class RestModule {}
