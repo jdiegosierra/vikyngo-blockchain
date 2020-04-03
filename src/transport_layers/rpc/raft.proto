@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package raft;
+
+service RaftService {
+  rpc ConsensusLeaderRequest (Message) returns (Empty) {}
+}
+
+message Message {
+  string message = 1;
+}
+
+message Empty {
+}

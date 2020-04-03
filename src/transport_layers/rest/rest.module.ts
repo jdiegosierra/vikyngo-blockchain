@@ -27,11 +27,23 @@ await app.listen(config.server['PORT'] || 3000); // Host?
 }*/
 
 import { Module } from '@nestjs/common';
+// import { RaftService } from '../../modules/chain/consensus/raft/raft.service';
 import { PingController } from "../../modules/ping/ping.controller";
-import { PingService } from "../../modules/ping/ping.service";
+import { ClientsModule } from '@nestjs/microservices';
+import { grpcOptions } from '../../config/transportOptions';
+// import { PingService } from '../../modules/ping/ping.service';
+
 
 @Module({
+    imports: [
+        ClientsModule.register([
+            {
+                name: 'RAFT_PACKAGE',
+                ...grpcOptions,
+            },
+        ]),
+    ],
     controllers: [PingController],
-    providers: [PingService]
+    providers: []
 })
 export class RestModule {}

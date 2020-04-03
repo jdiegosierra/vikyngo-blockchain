@@ -7,7 +7,7 @@ import { RpcController } from './rpc.controller';
   imports: [
     ClientsModule.register([
       {
-        name: 'HERO_PACKAGE',
+        name: 'RAFT_PACKAGE',
         ...grpcOptions,
       },
     ]),

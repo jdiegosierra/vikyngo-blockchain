@@ -4,8 +4,8 @@ import {join} from "path";
 export const grpcOptions: ClientOptions   = {
     transport: Transport.GRPC,
     options: {
-        package: 'hero',
-        protoPath: './src/transport_layers/rpc/hero.proto',
+        package: 'raft',
+        protoPath: './src/transport_layers/rpc/raft.proto',
         url: 'localhost: 8000',
     }
 };
