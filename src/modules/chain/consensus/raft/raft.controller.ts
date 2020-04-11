@@ -5,15 +5,15 @@ import { raftOptions } from '../../../../config/transportOptions';
 import { Observable } from 'rxjs';
 
 export interface RaftRequest {
-  message: string;
+  message: [string, (string | Int8Array)];
 }
 
-export interface RaftResponse {
-  message: string;
-}
+// export interface RaftResponse {
+//   message: handle;
+// }
 
 interface IRaftService {
-  leaderRequest(message: RaftRequest): Observable<RaftResponse>;
+  leaderRequest(message: RaftRequest): Array<any>;
 }
 
 @Controller('raft')
@@ -26,15 +26,16 @@ export class RaftController implements OnModuleInit {
     this.raftClient = this.client.getService<IRaftService>('RaftService');
   }
   @GrpcMethod('RaftService')
-  leaderRequest(message: RaftRequest): RaftResponse {
-    return {message: RaftService.parseRequest(message.message, 3).toString()};
+  leaderRequest(message: RaftRequest): any {
+    const raftService = new RaftService(this.raftClient);
+    return {message: raftService.handleRaftMessage(message.message).toString()};
   }
 
-  @Get()
-  sendRequest(): string {
-    this.raftClient.leaderRequest({message: "I want to be the leader"}).subscribe(response => {
-      console.log(response.message);
-    });
-    return "You are the leader";
-  }
+  // @Get()
+  // sendRequest(): string {
+  //   this.raftClient.leaderRequest({message: "I want to be the leader"}).subscribe(response => {
+  //     console.log(response.message);
+  //   });
+  //   return "You are the leader";
+  // }
 }
