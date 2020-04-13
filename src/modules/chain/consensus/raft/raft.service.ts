@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Observable } from 'rxjs';
 // import { Reseteable, Timer } from './timer';
 // import config from '../../../../config/default';
 const config = {server: "hola"};
@@ -21,12 +22,14 @@ class Reseteable implements Timer{
     public interval: number,
     readonly args: Iterable<any> = null,
     // readonly kwargs: Iterable<any> = null
-  ) {};
+  ) {
+    this.setTimer();
+  };
 
   setTimer(interval?: number): void {
     this.interval = interval ? interval : this.interval;
     clearTimeout(this._timer);
-    this._timer = setTimeout(this.callback, this.interval, this.args);
+    this._timer = setInterval(this.callback, this.interval, this.args);
   }
 
   cancel(): void {
@@ -36,8 +39,9 @@ class Reseteable implements Timer{
 interface RaftRequest {
   message: [string, (string | Int8Array)];
 }
-interface IRaftService {
-  leaderRequest(message: RaftRequest): Array<any>;
+export class IRaftService {
+  // @ts-ignore
+  leaderRequest(message: RaftRequest): Observable<any>;
 }
 
 enum ServiceState {
@@ -76,15 +80,15 @@ export class RaftService {
   private _heartbeatInterval: Reseteable;
 
   constructor (private _networkModule: IRaftService) {
+    console.log('constructor');
     // private _timerFactory: ITimerFactory,
-    // private _networkModule: any)
     this._state = ServiceState.OFF;
-
     this._resetRaftState();
-    console.log("RAFT Started");
+    // this._sendHeartbeat();
   }
 
   private _resetRaftState(): void {
+    console.log('_resetRaftState');
     // Sets the initial status to the service.
     this._raftStatus = RaftStatus.FOLLOWER;
     this._votingTo = null;
@@ -95,6 +99,7 @@ export class RaftService {
   }
 
   private static _getRandomElectionTimeout(): number {
+    console.log('_getRandomElectionTimeout');
     //   """Renews the timeout.
     //
     // Returns:
@@ -104,6 +109,7 @@ export class RaftService {
   }
 
   private _startStatus(): void {
+    console.log('_startStatus');
     // Starts the timers according to the current status.
     if (this._state === ServiceState.OFF)
       return;
@@ -123,18 +129,18 @@ export class RaftService {
   }
 
   private _startFollowerStatus(): void {
+    console.log('_startFollowerStatus');
     if (this._state !== ServiceState.ON)
       return;
     this._candidateTimer = new Reseteable(this._setRaftStatus, RaftService._getRandomElectionTimeout(), [RaftStatus.CANDIDATE]);
-    this._candidateTimer.setTimer();
   }
 
   private _startCandidateStatus(): void {
+    console.log('_startCandidateStatus');
     if (this._state !== ServiceState.ON)
       return;
     this._votingTo = this._validatorId;
     this._electionFailedTimer = new Reseteable(this._setRaftStatus, RaftService._getRandomElectionTimeout(), [RaftStatus.FOLLOWER]);
-    this._electionFailedTimer.setTimer();
     if (this._requestVote())
       this._setRaftStatus(RaftStatus.LEADER);
     else
@@ -142,6 +148,7 @@ export class RaftService {
   }
 
   private _startLeaderStatus() {
+    console.log('_startLeaderStatus');
     // """Sets the node raft status as leader."""
     if (this._state != ServiceState.ON)
       return;
@@ -150,10 +157,10 @@ export class RaftService {
     this._stepDownCounter = 0;
     this._leader = this._validatorId;
     this._heartbeatInterval = new Reseteable(this._setRaftStatus, config.server['RAFT']['HEARTBEAT_INTERVAL'], []);
-    this._heartbeatInterval.setTimer();
   }
 
   private _endStatus(): void {
+    console.log('_endStatus');
     // """Stops the timers according to the status."""
     if (this._state !== ServiceState.ON)
       return;
@@ -176,6 +183,7 @@ export class RaftService {
   }
 
   private _setRaftStatus(status: RaftStatus): void {
+    console.log('_setRaftStatus');
     // """Sets this to a given status.
     //
     // Args:
@@ -190,7 +198,8 @@ export class RaftService {
     }
   }
 
-  private _sendRequest(message: any, minN: number): boolean {
+  private _sendRequest(message: RaftRequest, minN: number): boolean {
+    console.log('_sendRequest');
     // """Sends a raft message [ConsensusLeaderRequest].
     //
     // Args:
@@ -204,8 +213,7 @@ export class RaftService {
     // let total = 0;
     const result = false;
     // let response;
-    const messagee: RaftRequest = {message};
-    this._networkModule.leaderRequest(messagee);
+    this._networkModule.leaderRequest(message).subscribe(value => console.log(value));
     // this._validatorPeerHashes.forEach((validatorIndex, publicKey) => {
     //   if (publicKey === null)
     //     return;
@@ -227,15 +235,15 @@ export class RaftService {
     // """Requests the vote to the rest of validator nodes to become
     // leader."""
     // const message = ConsensusLeaderRequest(ConsensusLeaderRequest.Type.VOTE_REQUEST);
-    const message = "voteme";
+    const message: RaftRequest = {message: ['1', 'votemee']};
     const minVotes = Math.floor(this._validatorPeerHashes.size * config.server['RAFT']['TOLERANCE']);
     return this._sendRequest(message, Math.max(minVotes, config.server['RAFT']['RAFT_MIN_NODES']));
   }
 
-  private _sendHeartbeat(): boolean {
+   _sendHeartbeat(): boolean {
     // """Sends a message to maintain the authority as leader."""
     // const message = ConsensusLeaderRequest(ConsensusLeaderRequest.Type.VOTE_REQUEST);
-    const message = "heartbeat";
+    const message: RaftRequest = {message: ['1', 'heartbeattt']};
     return this._sendRequest(message, 1);
   }
 

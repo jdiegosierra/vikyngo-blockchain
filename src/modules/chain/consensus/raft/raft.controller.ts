@@ -13,7 +13,7 @@ export interface RaftRequest {
 // }
 
 interface IRaftService {
-  leaderRequest(message: RaftRequest): Array<any>;
+  leaderRequest(message: RaftRequest): Observable<any>;
 }
 
 @Controller('raft')
